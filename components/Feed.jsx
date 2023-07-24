@@ -22,17 +22,50 @@ const PromptCardList = ({ data, handleTagClick }) => {
 const Feed = () => {
   const [searchText, setSearchText] = useState('');
   const [posts, setPosts] = useState([]);
+  const [filteredPosts, setFilteredPosts] = useState([]);
 
-  const handleSearchChange = (e) => {}
+  const fetchPosts = async () => {
+    const response = await fetch('/api/prompt');
+    const data = await response.json();
+    setPosts(data);
+    setFilteredPosts(data);
+  }
+  
+  const getFilteredPosts = () => {
+    if (!searchText) {
+      return;
+    }
+    const searchTerm = searchText.toLowerCase(); // case-insensitive search text
+    const filteredPosts = posts.filter(post => (
+      post.tag.toLowerCase().includes(searchTerm) ||
+      post.prompt.toLowerCase().includes(searchTerm) ||
+      post.creator.username.toLowerCase().includes(searchTerm)));
+    setFilteredPosts(filteredPosts);
+  }
+
+  const handleSearchChange = (e) => {
+    setSearchText(e.target.value);
+    if (!e.target.value) {
+      setFilteredPosts(posts);
+    }
+  }
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      const response = await fetch('/api/prompt');
-      const data = await response.json();
-      setPosts(data);
-    }
     fetchPosts();
   }, []);
+
+  useEffect(() => {
+    const id = setTimeout(() => {
+      getFilteredPosts();
+    }, 500);
+    return () => clearTimeout(id);
+  }, [searchText]);
+
+  const handleTagClick = (searchTag) => {
+    setSearchText(searchTag);
+    const filteredPosts = posts.filter(post => post.tag.toLowerCase().includes(searchTag.toLowerCase()));
+    setPosts(filteredPosts);
+  }
 
   return (
     <section className="feed">
@@ -47,11 +80,11 @@ const Feed = () => {
         />
       </form>
       <PromptCardList
-        data={posts}
-        handleTagClick={() => {}}
+        data={filteredPosts}
+        handleTagClick={handleTagClick}
       />
     </section>
   )
 }
 
-export default Feed
+export default Feed;

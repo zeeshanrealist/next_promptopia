@@ -29,7 +29,6 @@ const EditPrompt = () => {
       }
     }
     if (promptId) {
-      console.log('call the function')
       getPrompt();
     }
   }, [promptId]);
@@ -48,7 +47,6 @@ const EditPrompt = () => {
           tag: post.tag
         })
       });
-      console.log('response ok---', response.ok);
       if (response.ok) {
         router.push('/');
       }

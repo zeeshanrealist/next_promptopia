@@ -34,7 +34,6 @@ const MyProfile = () => {
         const response = await fetch(`/api/prompt/${post._id.toString()}`, {
           method: 'DELETE'
         });
-        console.log('response-----ok', response.ok)
         if (response.ok) {
           const filteredPosts = posts.filter(
             savedPost => savedPost._id !== post._id);
